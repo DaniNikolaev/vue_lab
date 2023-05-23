@@ -21,10 +21,18 @@ abstract class TableModule
      * @param array $fields
      * @return array
      */
-    public function read($fields = array())
+    public function read($needPlots=false,$plotFilter='default',$fields = array())
     {
-        $sql = "SELECT * FROM " . $this->getTableName() . " WHERE 1 ";
 
+        $sql = "SELECT * FROM " . $this->getTableName();
+        if ($needPlots===true)
+            $sql= "SELECT funerals.*,plots.plot FROM funerals LEFT JOIN plots ON funerals.plot = plots.id";
+        if ($plotFilter !== 'default')
+        {
+            if ($plotFilter)
+                $sql.=  ' WHERE funerals.plot='.$plotFilter;
+
+        }
         foreach ($fields as $key => $field) {
             $sql .= "AND " . $key . "=" . $field . " ";
         }
@@ -36,6 +44,10 @@ abstract class TableModule
         }
         return $result;
     }
+    /**
+     * @param array $field
+     * @return array
+     */
 
     /**
      * @param array $fields
@@ -103,5 +115,35 @@ abstract class TableModule
         $query->execute([]);
         $find = $query->fetch();
         return intval($find["MAX(ID)"]);
+    }
+    public function uploadImage(){
+
+        $uploadDir = $_SERVER['DOCUMENT_ROOT'].'/vue_lab/API/inc/images/';
+        $filename=basename($_FILES['file']['name']);
+        $uploadFile = $uploadDir.$filename;
+        $type=pathinfo($uploadFile, PATHINFO_EXTENSION);
+        $allowTypes = array('jpg', 'png', 'jpeg', 'gif', 'pdf','');
+        if (in_array($type, $allowTypes)) {
+            if (move_uploaded_file($_FILES["file"]["tmp_name"], $uploadFile))
+                $response=['upload-image'=>'yes'];
+            else
+                $response=['upload-image'=>'no'];
+        }
+        else
+            $response=['upload-image'=>'no'];
+        return  $response;
+    }
+    public function deleteImage($id)
+    {
+        $query= 'SELECT * FROM '. $this->getTableName(). ' WHERE id='.$id;
+        $query = Singleton::prepare($query);
+        $query->execute([]);
+        $result = array();
+        while ($slice = $query->fetch()) {
+            $result[] = $slice;
+        }
+        if (file_exists($_SERVER['DOCUMENT_ROOT'].'/vue_lab/API/inc/images/'.$result[0]["img_path"])) {
+            unlink($_SERVER['DOCUMENT_ROOT'] . '/vue_lab/API/inc/images/' . $result[0]["img_path"]);
+        }
     }
 }

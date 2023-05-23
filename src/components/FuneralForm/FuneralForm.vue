@@ -26,10 +26,16 @@
     </div>
     <div :class="$style.item">
       <div :class="$style.label">
+        <label for="img_path">Фото</label>
+      </div>
+      <input  :class="$style.input"  id="img_path" placeholder="Фото" type="file" accept="image/*" @change="form.img_path = uploadImage($event)" >
+    </div>
+    <div :class="$style.item">
+      <div :class="$style.label">
         <label for="plot">Участок</label>
       </div>
-      <select v-model="form.plot" :class="$style.select"  id="plot">
-        <option v-for="({ plot, id  }) in plotList" :key="id" :value="plot">
+      <select v-model="form.plot" :class="$style.select" id="plot">
+        <option v-for="({ plot, id  }) in plotList" :key="id" :value="id">
           {{ plot }}
         </option>
       </select>
@@ -44,10 +50,10 @@
 import { computed, reactive, onBeforeMount, watchEffect } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { selectItemById, fetchItems,selectItems } from '@/store/funerals/selectors';
+import { selectItemById, fetchItems} from '@/store/funerals/selectors';
 import { selectItems as selectPlots, fetchItems as fetchPlots } from '@/store/plots/selectors';
 import Btn from '@/components/Btn/Btn';
-//import {readFileSync,writeFileSync} from 'fs';
+import axios from "axios";
 
 export default {
   name: 'FuneralForm',
@@ -57,17 +63,41 @@ export default {
   components: {
     Btn,
   },
-
+  methods: {
+    uploadImage(event) {
+      const URL = 'http://localhost/vue_lab/API/rest/index.php/funerals/upload-image';
+      let data = new FormData();
+      data.append('name', 'my-picture');
+      data.append('file', event.target.files[0]);
+      let config = {
+        method: 'post',
+        header : {
+          'Content-Type' : 'image/png'
+        }
+      }
+      axios.post(
+          URL,
+          data,
+          config
+      ).then(
+          response => {
+            console.log('image upload response > ', response)
+          }
+      )
+      var fileData =  event.target.files[0];
+      return fileData.name;
+    }
+  },
   setup(props, context) {
     const store = useStore();
     const router = useRouter();
     const plotList = computed(() => selectPlots(store));
-    const funeralList=computed(()=>selectItems(store));
     const form = reactive({
       id: '',
       name: '',
       surname: '',
       age: '',
+      img_path: '',
       plot: '',
     });
 
@@ -85,9 +115,8 @@ export default {
 
     return {
       plotList,
-      funeralList,
       form,
-      isValidForm: computed(() =>  !!(form.name && form.surname && form.age && form.plot)),
+      isValidForm: computed(() =>  !!(form.name && form.surname && form.age&& form.img_path&& form.plot)),
       onClick: () => {
         context.emit('submit', form);
         router.push({ name: 'Funerals' });

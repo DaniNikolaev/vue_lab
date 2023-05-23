@@ -10,8 +10,7 @@ class Plots extends Api {
     super();
     this.count=0;
   }
-  plots = () => this.rest('/plots/list');
-
+  plots = () => this.rest('/plots/list.json').then();
   /**
    * Удалит участок по id
    * @param id
@@ -32,7 +31,7 @@ class Plots extends Api {
     method: 'POST',
     'Content-Type': 'application/json',
     body: JSON.stringify(plot),
-  }).then(() => ({...plot, id: ++this.count})) // then - заглушка, пока метод ничего не возвращает
+  }).then(() => ({...plot,id:++this.count})) // then - заглушка, пока метод ничего не возвращает
 
   /**
    * Отправит измененную запись

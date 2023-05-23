@@ -33,8 +33,8 @@ export default {
       const items = await response.json();
       commit('setItems', items)
     },
-    fetchFiltered: async ({commit})=>{
-      const response = await api.funeralsFiltered();
+    fetchFiltered: async ({commit},id)=>{
+      const response = await api.funeralsFiltered(id);
       const items=await response.json();
       commit('setItems',items);
     },
@@ -43,12 +43,12 @@ export default {
       commit('removeItem', idRemovedItem);
 
     },
-    addItem: async ({ commit }, { name, surname, age, plot }) => {
-      const item = await api.add({ name, surname, age, plot })
+    addItem: async ({ commit }, { name, surname, age,img_path, plot }) => {
+      const item = await api.add({ name, surname, age,img_path, plot })
       commit('setItem', item)
     },
-    updateItem: async ({ commit }, { id, name, surname, age, plot }) => {
-      const item = await api.update({ id, name, surname, age, plot });
+    updateItem: async ({ commit }, { id, name, surname, age, img_path,plot }) => {
+      const item = await api.update({ id, name, surname, age, img_path,plot });
       commit('updateItem', item);
     }
   },

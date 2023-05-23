@@ -1,10 +1,10 @@
 class Api {
   constructor() {
-    this.base = '/rest';
+    this.base = 'http://localhost/vue_lab/API/rest';
   }
 
   request = async (method, options) => {
-    const url ='http://localhost/vue_lab/API/rest/index.php'+ method;
+    const url =this.base + method;
     return fetch(url, options)
   }
 

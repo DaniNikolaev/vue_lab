@@ -10,7 +10,12 @@ class Funerals extends Api {
     super();
     this.count=0;
   }
-  funerals = () => this.rest('/funerals/list');
+  funerals = () => this.rest('/funerals/list.json');
+  funeralsFiltered = ( id ) => this.rest('/funerals/list-filtered', {
+    method: 'POST',
+    'Content-Type': 'application/json',
+    body: JSON.stringify({ id }),
+  })
 
   /**
    * Удалит похороны по id

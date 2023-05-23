@@ -3,7 +3,7 @@
     <Table
         :headers="[
           {value: 'id', text: 'ID'},
-          {value: 'plot', text: 'Участок'},
+          {value: 'plot', text: 'Номер участка'},
           {value: 'price', text: 'Стоимость участка'},
           {value: 'control', text: 'Действие'},
         ]"
@@ -29,8 +29,14 @@ import { useRouter } from 'vue-router';
 import { selectItems, removeItem, fetchItems  } from '@/store/plots/selectors'
 import Table from '@/components/Table/Table';
 import Btn from '@/components/Btn/Btn';
+import Plots from "@/store/plots";
 export default {
   name: 'PlotList',
+  computed:{
+    Plots(){
+      return Plots
+    }
+  },
   components: {
     Btn,
     Table,
